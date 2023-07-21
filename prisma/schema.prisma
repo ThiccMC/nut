@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Custom
+
+model Profile {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile info
+
+  // Rel
+  credential Credential @relation(fields: [cid], references: [id])
+  cid        Int        @unique @db.UnsignedInt
+}
+
+model Credential {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  username   String   @unique @db.Char(16)
+  realname   String   @db.Char(16)
+  password   String   @default("no")
+  ip         String?
+  lastlogin  BigInt?  @db.UnsignedBigInt
+  w          String   @default("l") @db.Char(16)
+  x          Float    @default(0) @db.Double
+  y          Float    @default(0) @db.Double
+  z          Float    @default(0) @db.Double
+  v          Float    @default(0) @db.Double
+  h          Float    @default(0) @db.Double
+  regdate    BigInt   @default(0) @db.UnsignedBigInt
+  regip      String?  @default("::1") @db.Char(39)
+  email      String?  @db.VarChar(255)
+  isLogged   Boolean  @default(false)
+  hasSession Boolean  @default(false)
+  totp       String?  @db.VarChar(32)
+  uuid       String?  @db.Char(32)
+  Profile    Profile?
+
+  @@map(name: "am")
+}
