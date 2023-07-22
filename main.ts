@@ -1,34 +1,20 @@
 import { PrismaClient } from "@prisma/client";
-import { ErrorMessage } from "./types/shared";
+
+/**
+ * Authentication helpers
+ */
 import { saltcheck } from "./utils/cipher";
-import { protocol, tokener, verify } from "./trusted";
+
+/**
+ * Token helpers
+ */
+import { protocol } from "./shared";
+import { tokener, verify } from "./trusted";
+import { JSONResponse, ErrorResponse, FutureResponse } from "./utils/bootstrap";
 
 const prisma = new PrismaClient();
 
 const mgex = /^[a-zA-Z0-9_]{2,16}$/;
-
-type FutureResponse = Promise<Response>;
-type JSONAble = object | boolean | number | string | null | undefined;
-
-class JSONResponse extends Response {
-  constructor(body: JSONAble, options?: ResponseInit) {
-    super(JSON.stringify(body), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      ...options,
-    });
-  }
-}
-
-class ErrorResponse extends JSONResponse {
-  constructor(body: ErrorMessage, status: number, options?: ResponseInit) {
-    super(body, {
-      status,
-      ...options,
-    });
-  }
-}
 
 module api {
   /* Auth */
@@ -110,7 +96,15 @@ module api {
   }
 }
 
+type RouteFunc =
+  | ((req: Request) => FutureResponse)
+  | ((req: Request) => Response)
+  | (() => FutureResponse)
+  | (() => Response);
+
 /* HTTP Flow */
+
+type MatchParams = [string, RouteFunc];
 
 class Resolver {
   readonly url: URL;
@@ -119,27 +113,24 @@ class Resolver {
     this.req = req;
     this.url = new URL(req.url);
   }
-  match(matcher: string) {
-    const pathname = this.url.pathname;
-    return pathname == matcher;
+  async match(matcher: string, lam: RouteFunc) {
+    return this.url.pathname == matcher && (await lam(this.req));
   }
-  matchMethod(method: string, matcher: string) {
-    return this.match(matcher) && this.req.method === method;
+  async matchMethod(method: string, ...so: MatchParams) {
+    return this.req.method === method && this.match(...so);
   }
 }
 
 Bun.serve({
   port: 8080,
-  fetch(req: Request) {
-    return new Promise<Response>((ok, panic) => {
-      const rs = new Resolver(req);
-      if (rs.matchMethod("POST", "/api/auth"))
-        api.auth(req).then(ok).catch(panic);
-      else if (rs.match("/api/auth/verify"))
-        api.auth_verify(req).then(ok).catch(panic);
-      else if (rs.match("/")) ok(new Response("Home"));
-      else ok(new Response("no?", { status: 404 }));
-    });
+  async fetch(req: Request) {
+    const rs = new Resolver(req);
+    return (
+      (await rs.matchMethod("POST", "/api/auth", api.auth)) ||
+      (await rs.match("/api/auth/verify", api.auth_verify)) ||
+      (await rs.match("/", () => new Response("Home"))) ||
+      new Response("no?", { status: 404 })
+    );
   },
 });
 
