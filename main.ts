@@ -113,7 +113,7 @@ class Resolver {
     this.req = req;
     this.url = new URL(req.url);
   }
-  async match(matcher: string, lam: RouteFunc) {
+  async match(...[matcher, lam]: MatchParams) {
     return this.url.pathname == matcher && (await lam(this.req));
   }
   async matchMethod(method: string, ...so: MatchParams) {

@@ -1,6 +1,6 @@
 {
   "name": "nut",
-  "proto": 1,
+  "proto": 10,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
