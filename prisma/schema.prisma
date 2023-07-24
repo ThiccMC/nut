@@ -31,20 +31,20 @@ model Credential {
   password   String   @default("no")
   ip         String?
   lastlogin  BigInt?  @db.UnsignedBigInt
-  w          String   @default("l") @db.Char(16)
-  x          Float    @default(0) @db.Double
-  y          Float    @default(0) @db.Double
-  z          Float    @default(0) @db.Double
-  v          Float    @default(0) @db.Double
-  h          Float    @default(0) @db.Double
+  world      String   @default("l") @db.Char(16)
+  x          Float?   @db.Double
+  y          Float?   @db.Double
+  z          Float?   @db.Double
+  pitch      Float?   @default(0) @db.Double
+  yaw        Float?   @default(0) @db.Double
   regdate    BigInt   @default(0) @db.UnsignedBigInt
   regip      String?  @default("::1") @db.Char(39)
   email      String?  @db.VarChar(255)
   isLogged   Boolean  @default(false)
   hasSession Boolean  @default(false)
   totp       String?  @db.VarChar(32)
-  uuid       String?  @db.Char(32)
-  Profile    Profile?
+  uuid       String?  @db.Char(36)
+  pf         Profile?
 
-  @@map(name: "am")
+  @@map(name: "authme")
 }
