@@ -1,13 +1,16 @@
 import { ErrorMessage } from "../types";
+import "./engine"
 
 export type FutureResponse = Promise<Response>;
 export type JSONAble = object | boolean | number | string | null | undefined;
 
 export class JSONResponse extends Response {
   constructor(body: JSONAble, options?: ResponseInit) {
-    super(JSON.stringify(body), {
+    const d = JSON.stringify(body);
+    super(d, {
       headers: {
         "Content-Type": "application/json",
+        "Content-Length": d.length.toString(),
       },
       ...options,
     });
