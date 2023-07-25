@@ -3,10 +3,12 @@ FROM debian:stable-slim as base
 RUN useradd -md /app bao
 WORKDIR /app
 ENV PATH "/app/.bun/bin:$PATH"
+RUN apt-get update -y
+RUN apt-get install -y openssl
 
 FROM base as basenv
 # please don't haunt me
-RUN apt-get update && yes | apt-get install curl unzip nodejs
+RUN apt-get install curl unzip nodejs -y
 
 FROM basenv as init
 RUN curl -fsSL https://bun.sh/install | bash
@@ -23,10 +25,11 @@ RUN bun install \
   && bun run init \
   && bun run build
 
-FROM base
+FROM base as runtime
 
 COPY --from=init --chown=bao /root /app
-COPY --from=build --chown=bao /app/package.json /app/dist ./
+COPY --from=build --chown=bao /app/package.json /app/dist /app/node_modules/.prisma/client/*.node ./
+COPY --chown=bao prisma ./
 USER bao
 # RUN bun install -p
 CMD ["/app/.bun/bin/bun", "index.js"]
