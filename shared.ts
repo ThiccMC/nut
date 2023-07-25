@@ -1,5 +1,5 @@
 import pkgjson from "./package.json";
-import { build, u } from "serdebin/helper";
+import { build, en8, u } from "serdebin/helper";
 import { Deserialization, extract_str, makeFixed } from "serdebin";
 import { trimStartPad } from "./utils/bytewise";
 import { nowSec } from "./utils/momentum";
@@ -71,4 +71,9 @@ export module protocol {
       profileId = reader.b() && reader.u(32);
     return { proto, scope, username, expire, profileId };
   }
+}
+
+
+export function de(de: string) {
+  return protocol.deserialize(new Deserialization(en8(de)))
 }
