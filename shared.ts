@@ -75,5 +75,5 @@ export module protocol {
 
 
 export function de(de: string) {
-  return protocol.deserialize(new Deserialization(en8(de)))
+  return protocol.deserialize(new Deserialization(en8(atob(de.split(".")[0]))))
 }
