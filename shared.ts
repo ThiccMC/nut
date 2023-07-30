@@ -51,7 +51,7 @@ export module protocol {
       // username
       makeFixed(extract_str(username), 16 * 8),
       // validUntil
-      u(32, nowSec()),
+      u(32, nowSec() + expire),
       // check pfid
       Boolean(pfid),
       // profile id

@@ -53,12 +53,17 @@ module api {
       select: {
         password: true,
         realname: true,
+        pf:{
+          select: {
+            id: true
+          }
+        }
       },
     });
     if (fetch) {
       const { password, realname } = fetch;
       if (saltcheck(fd.get("password") as string, password)) {
-        const f = protocol.serialize(username);
+        const f = protocol.serialize(username, fetch.pf?.id);
         return new JSONResponse({
           success: true,
           msg: "Authenticated as " + realname,
