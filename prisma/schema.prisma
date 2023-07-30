@@ -10,6 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  Partner
+}
+
 // Custom
 
 model Profile {
@@ -18,6 +22,9 @@ model Profile {
   updatedAt DateTime @updatedAt
 
   // Profile info
+
+  title String @db.VarChar(64)
+  roles Bytes  @db.Bit(16)
 
   // Rel
   credential Credential @relation(fields: [cid], references: [id])
