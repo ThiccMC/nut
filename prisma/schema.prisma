@@ -24,12 +24,43 @@ model Profile {
   // Profile info
 
   title String @db.VarChar(64)
-  roles Bytes  @db.Bit(16)
 
   // Rel
-  credential Credential @relation(fields: [cid], references: [id])
-  cid        Int        @unique @db.UnsignedInt
+  credential     Credential       @relation(fields: [cid], references: [id])
+  cid            Int              @unique @db.UnsignedInt
+  donations      Donation[]
+  BadgeOwnership BadgeOwnership[]
 }
+
+model Donation {
+  id Int @id @default(autoincrement()) @db.UnsignedInt
+
+  pf        Profile? @relation(fields: [profileId], references: [id])
+  profileId Int?     @db.UnsignedInt
+}
+
+model BadgeOwnership {
+  id Int @id @default(autoincrement()) @db.UnsignedInt
+
+  ownr Profile @relation(fields: [pfid], references: [id])
+  pfid Int     @db.UnsignedInt
+
+  since DateTime @default(now())
+
+  badge Badge @relation(fields: [bid], references: [id])
+  bid   Int   @db.UnsignedTinyInt
+}
+
+model Badge {
+  id Int @id @default(autoincrement()) @db.UnsignedTinyInt
+
+  name String @db.Char(16)
+  url  String @db.VarChar(512)
+
+  ownerships BadgeOwnership[]
+}
+
+// System
 
 model Credential {
   id         Int      @id @default(autoincrement()) @db.UnsignedInt
@@ -39,9 +70,9 @@ model Credential {
   ip         String?
   lastlogin  BigInt?  @db.UnsignedBigInt
   world      String   @default("l") @db.Char(16)
-  x          Float?   @db.Double
-  y          Float?   @db.Double
-  z          Float?   @db.Double
+  x          Float    @default(0) @db.Double
+  y          Float    @default(0) @db.Double
+  z          Float    @default(0) @db.Double
   pitch      Float?   @default(0) @db.Double
   yaw        Float?   @default(0) @db.Double
   regdate    BigInt   @default(0) @db.UnsignedBigInt
