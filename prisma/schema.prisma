@@ -45,7 +45,8 @@ model BadgeOwnership {
   ownr Profile @relation(fields: [pfid], references: [id])
   pfid Int     @db.UnsignedInt
 
-  since DateTime @default(now())
+  public Boolean  @default(true)
+  since  DateTime @default(now())
 
   badge Badge @relation(fields: [bid], references: [id])
   bid   Int   @db.UnsignedTinyInt
@@ -57,7 +58,8 @@ model Badge {
   name String @db.Char(16)
   url  String @db.VarChar(512)
 
-  ownerships BadgeOwnership[]
+  ignorePrivate Boolean          @default(false) @map("cnohidn")
+  ownerships    BadgeOwnership[]
 }
 
 // System
