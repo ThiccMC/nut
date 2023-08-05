@@ -1,8 +1,8 @@
 {
-  "name": "nut",
+  "name": "@thiccmc/nut",
   "proto": 10,
   "version": "1.1.1",
-  "description": "",
+  "description": "An authentication server and a prisma client",
   "main": "index.js",
   "scripts": {
     "dev": "bun main.ts",
@@ -11,8 +11,8 @@
     "build": "bun x esbuild --bundle --minify --sourcemap --platform=node main.ts --outfile=dist/index.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "hUwUtao",
+  "license": "WTFPL",
   "devDependencies": {
     "@types/node": "^20.4.2",
     "@prisma/client": "5.0.0",
@@ -24,5 +24,13 @@
   },
   "dependencies": {
     "serdebin": "1.2.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThiccMC/nut.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ThiccMC/nut/issues"
+  },
+  "homepage": "https://github.com/ThiccMC/nut#readme"
 }
