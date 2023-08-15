@@ -1,35 +1,30 @@
-FROM debian:stable-slim as base
+FROM debian:11.6-slim as builder
 
-RUN useradd -md /app bao
 WORKDIR /app
-ENV PATH "/app/.bun/bin:$PATH"
-RUN apt-get update -y
-RUN apt-get install -y openssl
 
-FROM base as basenv
-# please don't haunt me
-RUN apt-get install curl unzip nodejs -y
+RUN apt update
+RUN apt install curl unzip -y
 
-FROM basenv as init
-RUN curl -fsSL https://bun.sh/install | bash
+RUN curl https://bun.sh/install | bash
 
-FROM basenv as benv
+COPY package.json .
+COPY bun.lockb .
 
-COPY --from=init --chown=bao /root /app
-USER bao
+RUN /root/.bun/bin/bun install --production
 
-FROM benv as build
+# ? -------------------------
+FROM gcr.io/distroless/base
 
-COPY --chown=bao . .
-RUN bun install \
-  && bun run init \
-  && bun run build
+WORKDIR /app
 
-FROM base as runtime
+COPY --from=builder /root/.bun/bin/bun bun
+COPY --from=builder /app/node_modules node_modules
 
-COPY --from=init --chown=bao /root /app
-COPY --from=build --chown=bao /app/package.json /app/dist /app/node_modules/.prisma/client/*.node ./
-COPY --chown=bao prisma ./
-USER bao
-# RUN bun install -p
-CMD ["/app/.bun/bin/bun", "index.js"]
+COPY src src
+# COPY public public
+# COPY tsconfig.json .
+
+ENV ENV production
+CMD ["./bun", "src/index.ts"]
+
+EXPOSE 3000

@@ -77,3 +77,5 @@ export module protocol {
 export function de(de: string) {
   return protocol.deserialize(new Deserialization(en8(atob(de.split(".")[0]))))
 }
+
+export * from "@prisma/client"
